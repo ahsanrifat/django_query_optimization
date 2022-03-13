@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from country import models as cm
-from django.db.models import Q
+from django.db.models import Q, F, Sum
 import ipdb
 from datetime import date
 from django.db import connection
@@ -45,6 +45,47 @@ def get_country_city_all_report(request):
     """
     # cursor.execute(query)
     # row = cursor.fetchall()
-    row = cm.Area.objects.select_related("city")
-    ipdb.set_trace()
+    # row = cm.Area.objects.select_related("city")
+    row = cm.Country.objects.prefetch_related("cities")
     return Response({"data": row.values()})
+
+
+@api_view()
+def get_a_countrys_areas(request):
+    """combined full report"""
+    c = cm.Country.objects.filter(id=1)
+    c2 = cm.City.objects.filter(country__in=c.values("id"))
+    # row = cm.Area.objects.filter(city__in=c2.values("id"))
+    # row = cm.Area.objects.filter(city__in=c2.values("id")).annotate(
+    # 2 F's means two full join
+    #     City_name=F("city__city_name"), Country_name=F("city__country__country_name")
+    # )
+    row = cm.Area.objects.filter(city__in=c2.values("id")).annotate(
+        City_name=F("city__city_name")
+    )
+    return Response({"data": row.values()})
+
+
+@api_view()
+def get_a_countrys_areas(request):
+    """combined full report"""
+    c = cm.Country.objects.filter(id=1)
+    c2 = cm.City.objects.filter(country__in=c.values("id"))
+    # row = cm.Area.objects.filter(city__in=c2.values("id"))
+    # row = cm.Area.objects.filter(city__in=c2.values("id")).annotate(
+    #     City_name=F("city__city_name"), Country_name=F("city__country__country_name")
+    # )
+    row = cm.Area.objects.filter(city__in=c2.values("id")).annotate(
+        City_name=F("city__city_name")
+    )
+    return Response({"data": row.values()})
+
+
+@api_view()
+def revenue_aggregate(request):
+    row = (
+        cm.Revenue.objects.values("country")
+        .order_by("country")
+        .annotate(total_revenue=Sum("amount"), country_name=F("country__country_name"))
+    )
+    return Response({"data": row})
