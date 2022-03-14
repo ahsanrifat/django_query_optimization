@@ -114,17 +114,42 @@ def country_wise_total_land(request):
     result = (
         cm.City.objects.values("country__country_name")
         .annotate(country_population=Sum("land"))
+        .filter(country_population__gt=300000)
         .order_by("country_population")[:30]
     )
     """ 
     SELECT "country"."country_name", 
-    SUM("city"."land") AS "country_population" FROM "city"
+    SUM("city"."land") AS "country_land" FROM "city"
     INNER JOIN "country" ON ("city"."country_id" = "country"."id") 
     GROUP BY "country"."country_name" 
-    ORDER BY "country_population" 
+    ORDER BY "country_land" 
     ASC LIMIT 30; 
     """
     return Response({"data": result})
+
+
+@api_view()
+def country_wise_city_list(request):
+    countries = list(cm.Country.objects.prefetch_related("cities"))
+    data = []
+    for country in countries:
+        print("Country-->", country)
+        country_dict = country.__dict__
+        city_list = []
+        for o in country_dict["_prefetched_objects_cache"]["cities"]:
+            o = o.__dict__
+            del o["_state"]
+            city_list.append(o)
+        # country_dict["_prefetched_objects_cache"]["cities"] = [
+        #     o.__dict__ for o in country_dict["_prefetched_objects_cache"]["cities"]
+        # ]
+        country_dict["_prefetched_objects_cache"]["cities"] = city_list
+        country_dict["cities"] = city_list
+        del country_dict["_prefetched_objects_cache"]["cities"]
+        del country_dict["_state"]
+        print(country_dict)
+        data.append(country_dict)
+    return Response({"data": data})
 
 
 # ----------------Helper Method------------------------
@@ -169,4 +194,24 @@ def bulk_insert_city():
             )
         )
     cm.City.objects.bulk_create(instence_list)
+    print("Bulk Insert Done")
+
+
+def bulk_insert_area():
+    area_type = ["Metropolitan", "Downtown", "Urban", "Rural"]
+    instence_list = []
+    cities = list(cm.City.objects.all())
+    for i in range(990000):
+        city_id = random.randint(1, 99005)
+        print("Number-->", i)
+        instence_list.append(
+            cm.Area(
+                area_name=give_random_string(8),
+                maintain_cost=random.randint(10000, 1000000),
+                chairman=give_random_string(6),
+                area_type=random.choice(area_type),
+                city=random.choice(cities),
+            )
+        )
+    cm.Area.objects.bulk_create(instence_list)
     print("Bulk Insert Done")

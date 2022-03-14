@@ -35,7 +35,7 @@ class City(models.Model):
     )
     mayor = models.CharField(blank=True, null=True, max_length=100)
     land = models.IntegerField(blank=True, null=True)
-    
+
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.city_name
@@ -47,6 +47,9 @@ class City(models.Model):
 class Area(models.Model):
     area_name = models.CharField(max_length=100)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name="areas")
+    chairman = models.CharField(blank=True, null=True, max_length=100)
+    maintain_cost = models.IntegerField(blank=True, null=True)
+    area_type = models.CharField(blank=True, null=True, max_length=100)
 
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
