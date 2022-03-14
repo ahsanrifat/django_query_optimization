@@ -111,14 +111,18 @@ def country_wise_largest_city(request):
 
 @api_view()
 def country_wise_total_land(request):
-    result = cm.City.objects.values("country__country_name").annotate(Sum("land"))[:30]
+    result = (
+        cm.City.objects.values("country__country_name")
+        .annotate(country_population=Sum("land"))
+        .order_by("country_population")[:30]
+    )
     """ 
     SELECT "country"."country_name", 
-        SUM("city"."land") AS "land__sum" 
-        FROM "city" 
-        INNER JOIN "country" 
-        ON ("city"."country_id" = "country"."id") 
-    GROUP BY "country"."country_name" LIMIT 30; 
+    SUM("city"."land") AS "country_population" FROM "city"
+    INNER JOIN "country" ON ("city"."country_id" = "country"."id") 
+    GROUP BY "country"."country_name" 
+    ORDER BY "country_population" 
+    ASC LIMIT 30; 
     """
     return Response({"data": result})
 
