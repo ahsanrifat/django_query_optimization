@@ -1,8 +1,13 @@
+from email.policy import default
 from django.db import models
 
 # Create your models here.
 class Country(models.Model):
     country_name = models.CharField(max_length=100)
+    land = models.IntegerField(blank=True, null=True)
+    population = models.IntegerField(blank=True, null=True)
+    average_age = models.IntegerField(blank=True, null=True)
+    economy_type = models.CharField(blank=True, null=True, max_length=50)
 
     @property
     def city_counts(self):
@@ -12,12 +17,6 @@ class Country(models.Model):
     def area_list(self):
         areas_list = []
         cities = [city.id for city in list(self.cities.all())]
-        # for city in cities:
-        #     [
-        #         areas_list.append(area.area_name + " (" + city.city_name + ")")
-        #         for area in city.areas.all()
-        #     ]
-        # return areas_list
         areas = Area.objects.filter(city__in=cities)
         return areas
 
@@ -34,7 +33,9 @@ class City(models.Model):
     country = models.ForeignKey(
         Country, on_delete=models.CASCADE, related_name="cities"
     )
-
+    mayor = models.CharField(blank=True, null=True, max_length=100)
+    land = models.IntegerField(blank=True, null=True)
+    
     def __str__(self):
         """String for representing the MyModelName object (in Admin site etc.)."""
         return self.city_name
