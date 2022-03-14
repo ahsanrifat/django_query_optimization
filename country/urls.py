@@ -6,6 +6,7 @@ from country.views import (
     get_a_countrys_areas,
     revenue_aggregate,
     country_wise_largest_city,
+    country_wise_total_land,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path("country/areas", get_a_countrys_areas),
     path("revenue/report/", revenue_aggregate),
     path("largest/city/", country_wise_largest_city),
+    path("total_land/", country_wise_total_land),
 ]

@@ -99,8 +99,31 @@ def country_wise_largest_city(request):
         .values("country_name")
         .annotate(largest_city=Subquery(city_qr.values("city_name")[:1]))
     )[:5]
-    return Response({"data": result.values("country_name", "largest_city")})
+    """ 
+    SELECT "country"."country_name",
+        (SELECT U0."city_name" FROM "city" U0 WHERE U0."country_id" = ("country"."id") 
+        ORDER BY U0."land" DESC LIMIT 1) AS "largest_city" 
+    FROM "country" 
+    WHERE "country"."country_name" LIKE 'g%' ESCAPE '\' LIMIT 5;
+    """
+    return Response({"data": result})
 
+
+@api_view()
+def country_wise_total_land(request):
+    result = cm.City.objects.values("country__country_name").annotate(Sum("land"))[:30]
+    """ 
+    SELECT "country"."country_name", 
+        SUM("city"."land") AS "land__sum" 
+        FROM "city" 
+        INNER JOIN "country" 
+        ON ("city"."country_id" = "country"."id") 
+    GROUP BY "country"."country_name" LIMIT 30; 
+    """
+    return Response({"data": result})
+
+
+# ----------------Helper Method------------------------
 
 import random, string
 
