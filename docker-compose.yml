@@ -9,6 +9,7 @@ services:
       - ./:/app #this maps real time change from local to docker container
       #- orm_vol:/app/data
     command: python manage.py runserver 0.0.0.0:8000
+    # entrypoint: entry.sh
   db:
     image: postgres:13.0-alpine
     container_name: orm_psg_c

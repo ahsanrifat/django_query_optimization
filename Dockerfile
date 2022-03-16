@@ -10,6 +10,7 @@ RUN mkdir data/db
 # RUN mkdir data [permission error --> find out the reason]
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+# COPY entry.sh .
 COPY . .
 # CMD python manage.py shell_plus --ipython
 ENV db_user=postgres

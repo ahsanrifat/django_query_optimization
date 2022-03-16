@@ -21,7 +21,7 @@ def test_api(request):
 def revenue_range(request):
     rev_list = cm.Revenue.objects.filter(
         # Q(country_name__startswith="USA"),
-        Q(date__gt=date(2005, 5, 2))
+        Q(date__gt=date(2021, 12, 25))
         | Q(date__lt=date(2022, 5, 6))
     )
     """ 
