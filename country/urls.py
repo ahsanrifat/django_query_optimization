@@ -11,7 +11,7 @@ from country.views import (
 )
 
 urlpatterns = [
-    path("test/", test_api),
+    path("populate_db/", test_api),
     path("rev_range/", revenue_range),
     path("full_report/", get_country_city_all_report),
     path("country/areas", get_a_countrys_areas),

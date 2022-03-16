@@ -62,12 +62,17 @@ class Area(models.Model):
 class Revenue(models.Model):
     date = models.DateField(default=None)
     amount = models.IntegerField()
-    country = models.ForeignKey(
-        Country, on_delete=models.CASCADE, related_name="revenues"
+    area = models.ForeignKey(
+        Area,
+        on_delete=models.CASCADE,
+        related_name="revenues",
+        default=None,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
-        return self.country.country_name + " " + str(self.date)
+        return self.area.area_name + " " + str(self.date)
 
     class Meta:
         db_table = "revenue"

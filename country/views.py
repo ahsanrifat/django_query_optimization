@@ -10,9 +10,11 @@ from django.db import connection
 
 @api_view()
 def test_api(request):
-    country_list = cm.Country.objects.all()
-
-    return Response({"message": country_list.values()})
+    bulk_insert_country()
+    bulk_insert_city()
+    bulk_insert_area()
+    bulk_insert_revenue()
+    return Response({"message": "db population done"})
 
 
 @api_view()
@@ -162,10 +164,10 @@ def give_random_string(length):
     return "".join(random.choice(letters) for i in range(length))
 
 
-def bulk_insert():
+def bulk_insert_country():
     economy_type = ["Business", "Industry", "Agriculture", "Tourism"]
     instence_list = []
-    for _ in range(100000):
+    for _ in range(10000):
         instence_list.append(
             cm.Country(
                 country_name=give_random_string(8),
@@ -182,15 +184,15 @@ def bulk_insert():
 def bulk_insert_city():
 
     instence_list = []
-    for _ in range(99000):
-        country_id = random.randint(1, 100000)
-        print("Country id-->", country_id)
+    countries = list(cm.Country.objects.all())
+    for i in range(20000):
+        print("City no-->", i)
         instence_list.append(
             cm.City(
                 city_name=give_random_string(8),
                 land=random.randint(10000000, 1000000000),
                 mayor=give_random_string(6),
-                country=cm.Country.objects.get(id=country_id),
+                country=random.choice(countries),
             )
         )
     cm.City.objects.bulk_create(instence_list)
@@ -201,8 +203,7 @@ def bulk_insert_area():
     area_type = ["Metropolitan", "Downtown", "Urban", "Rural"]
     instence_list = []
     cities = list(cm.City.objects.all())
-    for i in range(990000):
-        city_id = random.randint(1, 99005)
+    for i in range(40000):
         print("Number-->", i)
         instence_list.append(
             cm.Area(
@@ -214,4 +215,27 @@ def bulk_insert_area():
             )
         )
     cm.Area.objects.bulk_create(instence_list)
+    print("Bulk Insert Done")
+
+
+import datetime
+
+
+def bulk_insert_revenue():
+    instence_list = []
+    areas = list(cm.Area.objects.all())
+    for i in range(90000):
+        print("Number-->", i)
+        year = random.randint(1920, 2023)
+        day = random.randint(1, 28)
+        month = random.randint(1, 12)
+        date = datetime.datetime(year, month, day)
+        instence_list.append(
+            cm.Revenue(
+                date=date,
+                amount=random.randint(1000, 1000000),
+                area=random.choice(areas),
+            )
+        )
+    cm.Revenue.objects.bulk_create(instence_list)
     print("Bulk Insert Done")
