@@ -2,19 +2,23 @@ version: "3.8"
 services:
   backend:
     build: ./
+    restart: always
+    image: orm_backend
     container_name: orm_api_c
     ports:
       - 8000:8000
     volumes:
       - ./:/app #this maps real time change from local to docker container
       #- orm_vol:/app/data
-    command: python manage.py runserver 0.0.0.0:8000
-    # entrypoint: entry.sh
+    command: sh entrypoint.sh #python3 manage.py runserver 0.0.0.0:8000
+    # entrypoint: entrypoint.sh
   db:
+    restart: always
     image: postgres:13.0-alpine
     container_name: orm_psg_c
     ports:
-      - 5431:5432 # so that this db can be accessed from local
+      # local_port : docker_port
+      - 5000:5432 # so that this db can be accessed from local
     volumes:
       - postgres_data:/app/data/db
     environment:
@@ -23,7 +27,7 @@ services:
       - POSTGRES_DB=hello_django_dev
 
 volumes:
-  orm_vol:
-    external: True
+  # orm_vol:
+  #   external: True
   postgres_data:
     external: True
