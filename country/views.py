@@ -10,11 +10,14 @@ from django.db import connection
 
 @api_view()
 def test_api(request):
-    bulk_insert_country()
-    bulk_insert_city()
-    bulk_insert_area()
-    bulk_insert_revenue()
-    return Response({"message": "db population done"})
+    if cm.Country.objects.count()==0:
+        bulk_insert_country()
+        bulk_insert_city()
+        bulk_insert_area()
+        bulk_insert_revenue()
+        return Response({"message": "db population done"})
+    return Response({"message": "db is already populated"})
+    
 
 
 @api_view()
